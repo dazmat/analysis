@@ -9,4 +9,4 @@ The pdos_smearing.py script was modified using scripts from the CP2K website for
 
 The pdos_plot.py script takes .dat smeared pdos files and plots them. Usage ./pdos_plot.py -file1.dat -file2.dat ...
 
-The bond_dist.py script calculates bond distances in your structure between nearest neighbours, I havent yet implemented usage with command line parsing so have to change the name of .xyz file in script to calculate for desired structure
+The bond_dist.py script calculates bond distances in your structure between nearest neighbours, I havent yet implemented usage with command line parsing so have to change the name of .xyz file in script to calculate for desired structure. Usage ./bond_dist.py
