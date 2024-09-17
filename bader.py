@@ -11,7 +11,7 @@ def calculate_charge_differences(ref_file, def_file):
     data_ref = pd.read_csv(ref_file, delim_whitespace=True)
     data_def = pd.read_csv(def_file, delim_whitespace=True)
     
-    # Extract and convert coordinates from Bohr to Angstrom
+    # Extract and convert coordinates from Bohr to Angstrom by converting data to floats or integers (or NaN for any non numeric values)
     xyz_ref = data_ref.iloc[:, [1, 2, 3]].apply(pd.to_numeric, errors='coerce').values * 0.529177
     xyz_def = data_def.iloc[:, [1, 2, 3]].apply(pd.to_numeric, errors='coerce').values * 0.529177
 
@@ -19,10 +19,10 @@ def calculate_charge_differences(ref_file, def_file):
     charge_ref = data_ref.iloc[:, 4].values
     charge_def = data_def.iloc[:, 4].values
 
-    # Initialize list to hold charge differences for defective atoms
+    # Initialize list to hold charge differences for defective atoms of same length as xyz, hold NaN values
     charge_differences = np.full(len(xyz_def), np.nan)
 
-    # Calculate charge differences for atoms in the defective structure
+    # Calculate charge differences for atoms in the defective structure using min_displacement to match atoms in def to ref
     for j, (x2, y2, z2) in enumerate(xyz_def):
         min_displacement = float('inf')
         closest_charge = np.nan
@@ -30,10 +30,12 @@ def calculate_charge_differences(ref_file, def_file):
         for i, (x1, y1, z1) in enumerate(xyz_ref):
             displacement = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
             
+            # Matching atoms with min disp and extracting their index for charge
             if displacement < min_displacement:
                 min_displacement = displacement
                 closest_charge = charge_ref[i]
-        
+
+        # Calculates charge differences as long as a reference charge is not NaN
         if not np.isnan(closest_charge):
             charge_differences[j] = charge_def[j] - closest_charge
 
@@ -53,7 +55,7 @@ def plot_charge_differences(positions, charge_differences):
     ax = fig.add_subplot(111, projection='3d')
     sc = ax.scatter(x, y, z, c=charge_differences, cmap='coolwarm', s=50, edgecolor='k')
 
-    # Add color bar
+    # Add color bar, change the fraction to change the size of bar
     cbar = plt.colorbar(sc, fraction=0.03, pad=0.06)
     cbar.set_label('Charge Difference (e)', rotation=270, labelpad=15)
     
@@ -64,6 +66,7 @@ def plot_charge_differences(positions, charge_differences):
     ax.set_xlabel('X (Å)')
     ax.set_ylabel('Y (Å)')
     ax.set_zlabel('Z (Å)')
+    # Change angles to change the viewpoint of 3D plot
     ax.view_init(elev=90, azim=-90)
     plt.tight_layout()
 

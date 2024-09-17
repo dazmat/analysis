@@ -4,6 +4,7 @@ import sys
 
 class pdos:
     """
+    Modified from the CP2K website get_smearing_pdos.py
     Projected electronic density of states from CP2K output files.
 
     Attributes:
@@ -28,9 +29,11 @@ class pdos:
         """Read a CP2K .pdos file and build a pdos instance."""
         input_file = open(infilename, 'r')
 
+        # The first and second lines in the pdos files are headers
         firstline = input_file.readline().strip().split()
         secondline = input_file.readline().strip().split()
 
+        # Use self. so the variables are attributes of the pdos class and can be accessed below
         self.atom = firstline[6]
         self.iterstep = int(firstline[12][:-1])  # Remove trailing comma
         self.efermi = float(firstline[15])
@@ -43,21 +46,25 @@ class pdos:
         eigenvalue = []
         self.occupation = []
         self.pdos = []
-
+        
+        # Creates a list of eigenvalues, occupation and pdos for each orbital
         for line in lines:
             data = line.split()[1:]
             eigenvalue.append(float(data.pop(0)))
             self.occupation.append(int(float(data.pop(0))))
             self.pdos.append([float(i) for i in data])
 
-        self.e = [(x - self.efermi) * 27.2114 for x in eigenvalue]  # Convert to eV
-        self.tpdos = [sum(i) for i in self.pdos]
+        self.e = [(x - self.efermi) * 27.2114 for x in eigenvalue]  # Convert to eV and shift to fermi energy=0
+        self.tpdos = [sum(i) for i in self.pdos] # Make a total pdos by adding all orbital contributions
+    # Generates npts evently spaced between min and max energy, this grid can be modfied in the main function and centres the function on energy
 
     def delta(self, emin, emax, npts, energy, width):
-        """Return a delta-function centered at energy."""
+        """Return a Gaussian-like delta-function centered at energy used for smearing."""
         energies = np.linspace(emin, emax, npts)
         x = -((energies - energy) / width) ** 2
         return np.exp(x) / (np.sqrt(np.pi) * width)
+
+    # Compute a Gaussian like delta function centered at e scaled by pdos value at e 
 
     def smearing(self, npts, width):
         """Return a Gaussian smeared DOS."""

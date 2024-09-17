@@ -10,7 +10,7 @@ import sys
 
 #this script takes a reference and defect .xyz files, reads them with ase, identifys matching items (if no of atoms is not equal as in vacancy systems), calculates their (min) displacement. Bcos of course if you take two far away atoms their disps will be very high. Then plots it into a 3D graph. you can really change these settings if you want
 
-#normalize in this function is for user to identify, to normalise heat map
+# Normalize in this function is for user to identify, to normalise heat map
 def displacement(reference_file, defective_file, normalize=False):
     # Read the structures using ase
     pristine_atoms = read(reference_file, format='xyz')
@@ -29,14 +29,14 @@ def displacement(reference_file, defective_file, normalize=False):
     nl.update(pristine_atoms)
 
     # Calculate displacements for atoms in the defective structure
-    for j, (x2, y2, z2) in enumerate(defective_positions):#iterates through atom j for a;; its positions in def structure
-        min_displacement = float('inf')#initialised to infinitely large val
+    for j, (x2, y2, z2) in enumerate(defective_positions): # Iterates through atom j for a;; its positions in def structure
+        min_displacement = float('inf') #Initialised to infinitely large val
         
-        for i, (x1, y1, z1) in enumerate(pristine_positions): #loop through pris atoms the same
-            displacement = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2) #calulctaes disps using formula
+        for i, (x1, y1, z1) in enumerate(pristine_positions): # Loop through pris atoms the same
+            displacement = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2) # Calulctaes disps using formula
             
             if displacement < min_displacement:
-                min_displacement = displacement #find min disp
+                min_displacement = displacement # Find min disp
         
         displacements[j] = min_displacement
 
@@ -77,7 +77,7 @@ def plot_displacements(defective_positions, displacements, normalize):
     ax.set_xlabel('X (Å)')
     ax.set_ylabel('Y (Å)')
     ax.set_zlabel('Z (Å)')
-    ax.view_init(elev=90, azim=-90)#change rotation of the lattice depending on how the plot is to be viewed
+    ax.view_init(elev=90, azim=-90) # Change rotation of the lattice depending on how the plot is to be viewed
     plt.tight_layout()
     
     plt.savefig('displacement.png', transparent=True, dpi=200)
